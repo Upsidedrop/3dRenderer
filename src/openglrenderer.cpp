@@ -8,41 +8,43 @@
 
 using namespace glm;
 
+const int INDICES_PER_POINT = 6;
+
 OpenGLRenderer::OpenGLRenderer()
-:vertexArrayObject(0), vertexBufferObject(0), graphicsPipeline(0), indexBufferObject(0), offset(-3), rotation(0), scale(2)
+:vertexArrayObject(0), vertexBufferObject(0), graphicsPipeline(0), indexBufferObject(0), offset(-3), rotation(0), scale(2), vertexDataQueue(nullptr)
 {
-    VertexSpecification();
+    // VertexSpecification();
     CreateGraphicsPipeline();
 }
 void OpenGLRenderer::VertexSpecification(){
-    const std::vector<GLfloat> vertexData{
-        -0.5, -0.5, 0,
-        1.0, 0.0, 0.0,
+    // std::vector<GLfloat> vertexData{
+    //     -0.5, -0.5, 0,
+    //     1.0, 0.0, 0.0,
 
-         0.5, -0.5, 0,
-         0.0, 1.0, 0.0,
+    //      0.5, -0.5, 0,
+    //      0.0, 1.0, 0.0,
 
-        -0.5,  0.5, 0,
-         0.0, 0.0, 1.0,
+    //     -0.5,  0.5, 0,
+    //      0.0, 0.0, 1.0,
 
-         0.5, 0.5, 0,
-         0.0, 1.0, 0.0
-    };
+    //      0.5, 0.5, 0,
+    //      0.0, 1.0, 0.0
+    // };
 
     glGenVertexArrays(1, &vertexArrayObject);
     glBindVertexArray(vertexArrayObject);
     
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, Utils::getSize<GLfloat>(vertexData.size()), vertexData.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, Utils::getSize<GLfloat>(vertexDataQueue -> size()), vertexDataQueue -> data(), GL_STATIC_DRAW);
 
-    const std::vector<GLuint> indexBufferData{
-        1, 2, 0, 1, 3, 2
-    };
+    // const std::vector<GLuint> indexBufferData{
+    //     1, 2, 0, 1, 3, 2
+    // };
 
-    glGenBuffers(1, &indexBufferObject);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils::getSize<GLuint>(indexBufferData.size()), indexBufferData.data(), GL_STATIC_DRAW);
+    // glGenBuffers(1, &indexBufferObject);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils::getSize<GLuint>(indexBufferData.size()), indexBufferData.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Utils::getSize<GLfloat>(6), (GLvoid*)0);
@@ -108,22 +110,24 @@ void OpenGLRenderer::logShaderErrors(GLuint p_shaderObject, GLuint p_type){
     }
 }
 void OpenGLRenderer::PreDraw(int p_screenWidth, int p_screenHeight){
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
     glClearColor(0.75, 0.67, 0.55, 1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     glUseProgram(graphicsPipeline);
+    
+    glBindVertexArray(vertexArrayObject);
 
     rotation += 10 * Time::deltaTime;
 
-    mat4 transformMatrix = translate(mat4(1), vec3(0, 0, offset));
-    transformMatrix = rotate<float>(transformMatrix, radians(rotation), vec3(0, 1, 0));
-    transformMatrix = glm::scale(transformMatrix, vec3(scale, scale, scale));
+    // mat4 transformMatrix = translate(mat4(1), vec3(0, 0, offset));
+    // transformMatrix = rotate<float>(transformMatrix, radians(rotation), vec3(0, 1, 0));
+    // transformMatrix = glm::scale(transformMatrix, vec3(scale, scale, scale));
 
-    GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");
-    glUniformMatrix4fv(translateLocation, 1, GL_FALSE, &transformMatrix[0][0]);
+    // GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");
+    // glUniformMatrix4fv(translateLocation, 1, GL_FALSE, &transformMatrix[0][0]);
 
     mat4 cameraMatrix = cam.getCameraMatrix();
 
@@ -134,10 +138,30 @@ void OpenGLRenderer::PreDraw(int p_screenWidth, int p_screenHeight){
     GLint perspectiveLocation = glGetUniformLocation(graphicsPipeline, "u_PerspectiveMatrix");
     glUniformMatrix4fv(perspectiveLocation, 1, GL_FALSE, &perspectiveMatrix[0][0]);
 }
+void OpenGLRenderer::setTransformUniform(Transform& p_transform){
+    mat4 transformMatrix = translate(mat4(1), p_transform.position);
+    transformMatrix = rotate<float>(transformMatrix, radians(p_transform.rotation), vec3(0, 1, 0));
+    transformMatrix = glm::scale(transformMatrix, p_transform.scale);
+
+    GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");
+    glUniformMatrix4fv(translateLocation, 1, GL_FALSE, &transformMatrix[0][0]);
+}
 void OpenGLRenderer::Draw(){
-    glBindVertexArray(vertexArrayObject);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    
+    glDrawElements(GL_TRIANGLES, INDICES_PER_POINT, GL_UNSIGNED_INT, 0);
 }
 Camera* OpenGLRenderer::getCam(){
     return &cam;
+}
+
+int OpenGLRenderer::pushQueue(std::vector<GLfloat>& p_points){
+    if(vertexDataQueue == nullptr){
+        vertexDataQueue = new std::vector<GLfloat>();
+    }
+
+    int offset = vertexDataQueue -> size() / INDICES_PER_POINT;
+
+    vertexDataQueue->insert(vertexDataQueue -> end(), p_points.begin(), p_points.end());
+
+    return offset;
 }

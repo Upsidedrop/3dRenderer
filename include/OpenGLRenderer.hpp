@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Camera.hpp"
+#include "Transform.hpp"
 
 class OpenGLRenderer{
     public:
@@ -15,8 +16,10 @@ class OpenGLRenderer{
     float rotation;
     float scale;
     Camera* getCam();
-    private:
+    int pushQueue(std::vector<GLfloat>& p_points);
+    void setTransformUniform(Transform& p_transform);
     void VertexSpecification();
+    private:
     void CreateGraphicsPipeline();
     GLuint CreateShaderProgram(const std::string& p_vertexShader, const std::string& p_fragmentShader);
     GLuint CompileShader(GLuint p_type, const std::string& p_source);
@@ -27,4 +30,5 @@ class OpenGLRenderer{
     GLuint indexBufferObject;
     GLuint graphicsPipeline;
     Camera cam;
+    std::vector<GLfloat>* vertexDataQueue;
 };
