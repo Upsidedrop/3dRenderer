@@ -9,8 +9,8 @@ using namespace std;
 
 extern OpenGLRenderer* renderer;
 
-Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, Transform& p_transform)
-:transform(p_transform)
+Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, Transform& p_transform, const char* p_texture)
+:transform(p_transform), texture(renderer -> loadTexture(p_texture))
 {
     int offset = renderer -> pushQueue(p_points);
 
@@ -24,6 +24,7 @@ Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, Transform& p_t
 }
 void Mesh::Draw(){
     renderer -> setTransformUniform(transform);
+    renderer -> setTextureUniform(texture);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
     renderer -> Draw();
 }

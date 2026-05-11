@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <SDL2/SDL_surface.h>
 
 using namespace glm;
 
@@ -37,6 +38,8 @@ void OpenGLRenderer::VertexSpecification(){
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, Utils::getSize<GLfloat>(vertexDataQueue -> size()), vertexDataQueue -> data(), GL_STATIC_DRAW);
+
+    delete vertexDataQueue;
 
     // const std::vector<GLuint> indexBufferData{
     //     1, 2, 0, 1, 3, 2
@@ -105,6 +108,9 @@ void OpenGLRenderer::logShaderErrors(GLuint p_shaderObject, GLuint p_type){
         glGetShaderInfoLog(p_shaderObject, length, &length, errorMessages);
 
         std::cout << "ERROR: SHADER TYPE " << p_type << " FAILED TO COMPILE.\n";
+
+        std::cout << errorMessages << "\n";
+
         delete[] errorMessages;
         glDeleteShader(p_shaderObject);
     }
@@ -146,6 +152,15 @@ void OpenGLRenderer::setTransformUniform(Transform& p_transform){
     GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");
     glUniformMatrix4fv(translateLocation, 1, GL_FALSE, &transformMatrix[0][0]);
 }
+void OpenGLRenderer::setTextureUniform(GLuint p_tex){
+    // glEnable(GL_TEXTURE_2D);
+
+    // glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, p_tex);
+
+    // GLint samplerLocation = glGetUniformLocation(graphicsPipeline, "u_textureSampler");
+    // glUniform1i(samplerLocation, 0);
+}
 void OpenGLRenderer::Draw(){
     
     glDrawElements(GL_TRIANGLES, INDICES_PER_POINT, GL_UNSIGNED_INT, 0);
@@ -164,4 +179,25 @@ int OpenGLRenderer::pushQueue(std::vector<GLfloat>& p_points){
     vertexDataQueue->insert(vertexDataQueue -> end(), p_points.begin(), p_points.end());
 
     return offset;
+}
+GLuint OpenGLRenderer::loadTexture(const char* file){
+    SDL_Surface* surface = SDL_LoadBMP(file);
+    
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surface->pixels);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    SDL_FreeSurface(surface);
+
+    return textureID;
 }

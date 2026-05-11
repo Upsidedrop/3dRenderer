@@ -29,8 +29,10 @@ namespace Shaders{
 
     "out vec4 color;\n"
 
+    "uniform sampler2D u_textureSampler;\n"
+
     "void main()\n"
     "{\n"
-    "   color = vec4(v_vertexColors.r, v_vertexColors.g, v_vertexColors.b, 1.0);\n"
+    "   color = texture(u_textureSampler, vec2(v_vertexColors.x, v_vertexColors.y)).rgba;\n"
     "}\n";
 }

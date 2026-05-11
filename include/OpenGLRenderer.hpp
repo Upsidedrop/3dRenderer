@@ -18,7 +18,9 @@ class OpenGLRenderer{
     Camera* getCam();
     int pushQueue(std::vector<GLfloat>& p_points);
     void setTransformUniform(Transform& p_transform);
+    void setTextureUniform(GLuint p_tex);
     void VertexSpecification();
+    GLuint loadTexture(const char* file);
     private:
     void CreateGraphicsPipeline();
     GLuint CreateShaderProgram(const std::string& p_vertexShader, const std::string& p_fragmentShader);
