@@ -10,6 +10,7 @@
 #include "PlayerMovement.hpp"
 #include "Time.hpp"
 #include "Mesh.hpp"
+#include "LoadObj.hpp"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ int main(){
          1.0, 1.0, 0.0,
 
         -0.5,  0.5, 0,
-         0.0, 0.0, 1.0,
+         0.0, 0.0, 0.0,
 
          0.5, 0.5, 0,
          1.0, 0.0, 0.0
@@ -45,11 +46,25 @@ int main(){
     std::vector<GLuint> indexBufferData{
         1, 2, 0, 1, 3, 2
     };
-    Transform squarePos = {{0, 0, 0}, 0, {1, 1, 1}};
+    Transform squarePos = {{0, 0, -2}, 0, {1, 1, 1}};
     Mesh square(vertexData, indexBufferData, squarePos, "res/texture.bmp");
 
     Transform square2Pos = {{-2, 0, -1}, 0, {1, 1, 1}};
     Mesh square2(vertexData, indexBufferData, square2Pos, "res/texture2.bmp");
+
+    Mesh* foo;
+    LoadObj::ParseFile("res/icosphere/Untitled.obj",foo, "res/Icosphere.bmp");
+
+    foo -> transform.scale = {0.5, 0.5, 0.5};
+    foo -> transform.position = {0.5, 0, -0.5};
+
+    Mesh* bar;
+    LoadObj::ParseFile("res/obj/Untitled.obj",bar, "res/Cube.bmp");
+
+    bar -> transform.scale = {0.5, 0.5, 0.5};
+    bar -> transform.position = {-0.5, 0, -0.5};
+
+
 
     renderer -> VertexSpecification();
 
@@ -100,12 +115,16 @@ int main(){
         }
         square.Draw();
         square2.Draw();
+        foo -> Draw();
+        bar -> Draw();
         window.swapWindow();
     }
 
     SDL_Quit();
     window.cleanUp();
     delete renderer;
+    delete foo;
+    delete bar;
     
     return 0;
 }

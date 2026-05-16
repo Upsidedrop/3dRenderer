@@ -9,10 +9,10 @@ using namespace std;
 
 extern OpenGLRenderer* renderer;
 
-Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, Transform& p_transform, const char* p_texture)
+Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, const Transform& p_transform, const char* p_texture)
 :transform(p_transform), texture(renderer -> loadTexture(p_texture))
 {
-    int offset = renderer -> pushQueue(p_points);
+    int offset = renderer -> pushQueue(p_points, pointOrder.size());
 
     for(GLuint& elem : pointOrder){
         elem += offset;

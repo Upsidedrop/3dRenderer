@@ -7,10 +7,10 @@
 
 class Mesh{
     public:
-    Mesh(std::vector<GLfloat>& p_points, std::vector<GLuint>& pointOrder, Transform& p_transform, const char* p_texture);
+    Mesh(std::vector<GLfloat>& p_points, std::vector<GLuint>& pointOrder, const Transform& p_transform, const char* p_texture);
     void Draw();
+    Transform transform;
     private:
     GLuint indexBufferObject;
-    Transform transform;
     GLuint texture;
 };

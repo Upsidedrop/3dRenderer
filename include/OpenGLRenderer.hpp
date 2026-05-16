@@ -16,7 +16,7 @@ class OpenGLRenderer{
     float rotation;
     float scale;
     Camera* getCam();
-    int pushQueue(std::vector<GLfloat>& p_points);
+    int pushQueue(std::vector<GLfloat>& p_points, int queueSize);
     void setTransformUniform(Transform& p_transform);
     void setTextureUniform(GLuint p_tex);
     void VertexSpecification();
@@ -33,4 +33,5 @@ class OpenGLRenderer{
     GLuint graphicsPipeline;
     Camera cam;
     std::vector<GLfloat>* vertexDataQueue;
+    int drawCallSize;
 };

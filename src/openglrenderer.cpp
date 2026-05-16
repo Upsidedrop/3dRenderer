@@ -12,7 +12,7 @@ using namespace glm;
 const int INDICES_PER_POINT = 6;
 
 OpenGLRenderer::OpenGLRenderer()
-:vertexArrayObject(0), vertexBufferObject(0), graphicsPipeline(0), indexBufferObject(0), offset(-3), rotation(0), scale(2), vertexDataQueue(nullptr)
+:vertexArrayObject(0), vertexBufferObject(0), graphicsPipeline(0), indexBufferObject(0), offset(-3), rotation(0), scale(2), vertexDataQueue(nullptr), drawCallSize(0)
 {
     // VertexSpecification();
     CreateGraphicsPipeline();
@@ -163,16 +163,18 @@ void OpenGLRenderer::setTextureUniform(GLuint p_tex){
 }
 void OpenGLRenderer::Draw(){
     
-    glDrawElements(GL_TRIANGLES, INDICES_PER_POINT, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, drawCallSize, GL_UNSIGNED_INT, 0);
 }
 Camera* OpenGLRenderer::getCam(){
     return &cam;
 }
 
-int OpenGLRenderer::pushQueue(std::vector<GLfloat>& p_points){
+int OpenGLRenderer::pushQueue(std::vector<GLfloat>& p_points, int queueSize){
     if(vertexDataQueue == nullptr){
         vertexDataQueue = new std::vector<GLfloat>();
     }
+
+    drawCallSize += queueSize;
 
     int offset = vertexDataQueue -> size() / INDICES_PER_POINT;
 
@@ -194,6 +196,8 @@ GLuint OpenGLRenderer::loadTexture(const char* file){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surface->pixels);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
