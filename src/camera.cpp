@@ -21,6 +21,10 @@ glm::vec3 Camera::getPosition(){
 void Camera::turnHorizontal(float angle){
     lookDir = rotate(mat4(1), angle, upDir) * vec4(0, 0, -1, 1);
 }
+void Camera::turnVertical(float angle){
+    vec4 lookDir4 = vec4(lookDir.x, lookDir.y, lookDir.z, 0);
+    lookDir = rotate(mat4(1), angle, (vec3)(rotate(mat4(1), radians((float)90), upDir) * lookDir4)) * lookDir4;
+}
 vec3 Camera::getLookDir(){
     return lookDir;
 }

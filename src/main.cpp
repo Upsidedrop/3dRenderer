@@ -93,6 +93,14 @@ int main(){
                 case SDL_MOUSEMOTION:
                 {
                     Input::mousePos += glm::vec2(event.motion.xrel, event.motion.yrel);
+                    float limit = 89 / player.sensitivity;
+                    if(Input::mousePos.y > limit){
+                        Input::mousePos.y = limit;
+                    }
+                    if(Input::mousePos.y < -limit){
+                        Input::mousePos.y = -limit;
+                    }
+                    std::cout << Input::mousePos.y << "\n";
                     player.turnCamera();
                 }
                 break;
@@ -102,6 +110,7 @@ int main(){
                         window.windowResized(event.window.data1,event.window.data2);
                     }
                 }
+                break;
             }
         }
 

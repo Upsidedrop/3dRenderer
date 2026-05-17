@@ -8,9 +8,9 @@ class PlayerMovement{
     PlayerMovement(Camera* p_cam);
     void checkInputs();
     void turnCamera();
+    float sensitivity;
     private:
     Camera* cam;
-    float speed;
-    float sensitivity;
+    float speed, defaultSpeed;
     void moveDirection(glm::vec2 p_dir);
 };

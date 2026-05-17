@@ -13,11 +13,18 @@ using namespace Input;
 
 const int PIXEL_SIZE = 37;
 PlayerMovement::PlayerMovement(Camera* p_cam)
-:speed(2), sensitivity(0.1)
+:defaultSpeed(2), sensitivity(0.1)
 {
     cam = p_cam;
 }
 void PlayerMovement::checkInputs(){
+    if(keypresses[SDLK_LCTRL]){
+        speed = 2 * defaultSpeed;
+    }
+    else{
+        speed = defaultSpeed;
+    }
+
     vec2 velocity = vec2(0, 0);
     if(keypresses[SDLK_w]){
         velocity += vec2(0, -1);
@@ -32,6 +39,15 @@ void PlayerMovement::checkInputs(){
         velocity += vec2(1, 0);
     }
     moveDirection(velocity);
+    vec3 upForce = vec3(0);
+    if(keypresses[SDLK_SPACE]){
+        upForce += vec3(0, speed * Time::deltaTime, 0);
+    }
+    if(keypresses[SDLK_LSHIFT]){
+        upForce -= vec3(0, speed * Time::deltaTime, 0);
+    }
+    auto currentCamPos = cam -> getPosition();
+    cam -> setPosition(currentCamPos + upForce);
 }
 void PlayerMovement::moveDirection(vec2 p_dir){
     if(length(p_dir) == 0){
@@ -57,4 +73,5 @@ void PlayerMovement::moveDirection(vec2 p_dir){
 }
 void PlayerMovement::turnCamera(){
     cam -> turnHorizontal(-glm::radians(Input::mousePos.x * sensitivity));
+    cam -> turnVertical(glm::radians(Input::mousePos.y * sensitivity));
 }

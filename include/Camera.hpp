@@ -9,6 +9,7 @@ class Camera{
     void setPosition(glm::vec3 p_position);
     glm::vec3 getPosition();
     void turnHorizontal(float angle);
+    void turnVertical(float angle);
     glm::vec3 getLookDir();
     glm::vec3 getUpDir();
     private:
