@@ -31,9 +31,10 @@ void RenderWindow::swapWindow(){
 void RenderWindow::windowResized(int p_width, int p_height){
     width = p_width;
     height = p_height;
-    std::cout << "Width: " << width << ", Height: " << height << "\n";
 }
 void RenderWindow::getDimensions(int& outWidth, int& outHeight){
     outWidth = width;
     outHeight = height;
+    std::cout << "Width: " << width << ", Height: " << height << "\n";
+
 }
