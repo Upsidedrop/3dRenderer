@@ -6,4 +6,5 @@
 namespace Input{
     extern std::unordered_map<int, bool> keypresses;
     extern glm::vec2 mousePos;
+    extern bool mouseButtons[3];
 }

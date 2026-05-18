@@ -18,6 +18,13 @@ PlayerMovement::PlayerMovement(Camera* p_cam)
     cam = p_cam;
 }
 void PlayerMovement::checkInputs(){
+    if(!mouseButtons[2]){
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+        return;
+    }
+
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
     if(keypresses[SDLK_LCTRL]){
         speed = 2 * defaultSpeed;
     }

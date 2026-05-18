@@ -8,8 +8,8 @@ class RenderWindow{
         void swapWindow();
         void getDimensions(int& outWidth, int& outHeight);
         void windowResized(int p_width, int p_height);
-    private:
         SDL_Window* window;
+    private:
         SDL_GLContext context;
         int height, width;
 };

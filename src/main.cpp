@@ -69,8 +69,6 @@ int main(){
     renderer -> VertexSpecification();
 
     
-
-    SDL_SetRelativeMouseMode(SDL_TRUE);
     while(gameRunning){
         Time::updateDeltaTime();
         while(SDL_PollEvent(&event)){
@@ -92,6 +90,9 @@ int main(){
                 break;
                 case SDL_MOUSEMOTION:
                 {
+                    if(!Input::mouseButtons[2]){
+                        break;
+                    }
                     Input::mousePos += glm::vec2(event.motion.xrel, event.motion.yrel);
                     float limit = 89 / player.sensitivity;
                     if(Input::mousePos.y > limit){
@@ -101,6 +102,7 @@ int main(){
                         Input::mousePos.y = -limit;
                     }
                     std::cout << Input::mousePos.y << "\n";
+
                     player.turnCamera();
                 }
                 break;
@@ -109,6 +111,16 @@ int main(){
                     if(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED){
                         window.windowResized(event.window.data1,event.window.data2);
                     }
+                }
+                break;
+                case SDL_MOUSEBUTTONDOWN:
+                {
+                    Input::mouseButtons[event.button.button - 1] = true;
+                }
+                break;
+                case SDL_MOUSEBUTTONUP:
+                {
+                    Input::mouseButtons[event.button.button - 1] = false;
                 }
                 break;
             }
