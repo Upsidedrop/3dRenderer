@@ -131,6 +131,9 @@ int main(){
         {
             int outWidth, outHeight;
             window.getDimensions(outWidth, outHeight);
+            if(outWidth <= 0 || outHeight <= 0){
+                continue;
+            }
             glViewport(0,0,outWidth,outHeight);
             renderer -> PreDraw(outWidth, outHeight);
         }
