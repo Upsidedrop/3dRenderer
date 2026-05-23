@@ -26,6 +26,10 @@ namespace LoadObj{
 
         outMesh = new Mesh(data, indices, {{0, 0, 0}, 0, {1, 1, 1}}, texture);
         
+        outMesh -> bounds.generateFromPoints(vertexPositions);
+
+        std::cout << "Smaller: " << outMesh ->bounds.smallCorner.x << ", " << outMesh ->bounds.smallCorner.y << ", " << outMesh ->bounds.smallCorner.z << "\n";
+        std::cout << "Bigger: " << outMesh ->bounds.largeCorner.x << ", " << outMesh ->bounds.largeCorner.y << ", " << outMesh ->bounds.largeCorner.z << "\n";
     }
     void seperateValues(string& line, string* out, int size, int start, char delimiter){
         int i = 0;
