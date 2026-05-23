@@ -25,11 +25,13 @@ Mesh::Mesh(vector<GLfloat>& p_points, vector<GLuint>& pointOrder, const char* p_
 void Mesh::Draw(){
     renderer -> setTransformUniform(transform);
     renderer -> setTextureUniform(texture);
+    renderer -> setAlbedoUniform(color);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
     renderer -> Draw();
 }
-void Mesh::instantiate(const Transform& p_transform){
+void Mesh::instantiate(const Transform& p_transform, const glm::vec4& p_color){
     Mesh* foo = new Mesh(*this);
     foo -> transform = p_transform;
+    foo -> color = p_color;
     objects.push_back(foo);
 }

@@ -152,14 +152,12 @@ void OpenGLRenderer::setTransformUniform(Transform& p_transform){
     GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");
     glUniformMatrix4fv(translateLocation, 1, GL_FALSE, &transformMatrix[0][0]);
 }
+void OpenGLRenderer::setAlbedoUniform(glm::vec4& color){
+    GLint albedoLocation = glGetUniformLocation(graphicsPipeline, "u_Albedo");
+    glUniform4f(albedoLocation, color.r, color.g, color.b, color.a);
+}
 void OpenGLRenderer::setTextureUniform(GLuint p_tex){
-    // glEnable(GL_TEXTURE_2D);
-
-    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, p_tex);
-
-    // GLint samplerLocation = glGetUniformLocation(graphicsPipeline, "u_textureSampler");
-    // glUniform1i(samplerLocation, 0);
 }
 void OpenGLRenderer::Draw(){
     

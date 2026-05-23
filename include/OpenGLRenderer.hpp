@@ -19,6 +19,7 @@ class OpenGLRenderer{
     int pushQueue(std::vector<GLfloat>& p_points, int queueSize);
     void setTransformUniform(Transform& p_transform);
     void setTextureUniform(GLuint p_tex);
+    void setAlbedoUniform(glm::vec4& color);
     void VertexSpecification();
     GLuint loadTexture(const char* file);
     private:
