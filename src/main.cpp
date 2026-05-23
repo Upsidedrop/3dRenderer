@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
-
+#include <list>
 
 #include "RenderWindow.hpp"
 #include "OpenGLRenderer.hpp"
@@ -15,6 +15,8 @@
 using namespace std;
 
 OpenGLRenderer* renderer;
+std::vector<Mesh*> models;
+std::list<Mesh*> objects;
 
 int main(){
     if(SDL_Init(SDL_INIT_VIDEO) > 0){
@@ -30,44 +32,19 @@ int main(){
 
     PlayerMovement player(renderer -> getCam());
 
-    std::vector<GLfloat> vertexData{
-        -0.5, -0.5, 0,
-        0.0, 1.0, 0.0,
+    LoadObj::loadModels(
+        {
+            {"res/icosphere/Untitled.obj", "res/Icosphere.bmp"},
+            {"res/obj/Untitled.obj","res/Cube.bmp"}
+        }
+    );
 
-         0.5, -0.5, 0,
-         1.0, 1.0, 0.0,
-
-        -0.5,  0.5, 0,
-         0.0, 0.0, 0.0,
-
-         0.5, 0.5, 0,
-         1.0, 0.0, 0.0
-    };
-    std::vector<GLuint> indexBufferData{
-        1, 2, 0, 1, 3, 2
-    };
-    Transform squarePos = {{0, 0, -2}, 0, {1, 1, 1}};
-    Mesh square(vertexData, indexBufferData, squarePos, "res/texture.bmp");
-
-    Transform square2Pos = {{-2, 0, -1}, 0, {1, 1, 1}};
-    Mesh square2(vertexData, indexBufferData, square2Pos, "res/texture2.bmp");
-
-    Mesh* foo;
-    LoadObj::ParseFile("res/icosphere/Untitled.obj",foo, "res/Icosphere.bmp");
-
-    foo -> transform.scale = {0.5, 0.5, 0.5};
-    foo -> transform.position = {0.5, 0, -0.5};
-
-    Mesh* bar;
-    LoadObj::ParseFile("res/obj/Untitled.obj",bar, "res/Cube.bmp");
-
-    bar -> transform.scale = {0.5, 0.5, 0.5};
-    bar -> transform.position = {-0.5, 0, -0.5};
-
-
+    models[0] -> instantiate({{0.5, 0, -0.5}, 0, {0.5, 0.5, 0.5}});
+    models[1] -> instantiate({{-0.5, 0, -0.5}, 0, {0.5, 0.5, 0.5}});
+    models[1] -> instantiate({{-0.5, 1, -0.5}, 0, {0.5, 0.5, 0.5}});
+    models[1] -> instantiate({{-0.5, 2, -0.5}, 0, {0.5, 0.5, 0.5}});
 
     renderer -> VertexSpecification();
-
     
     while(gameRunning){
         Time::updateDeltaTime();
@@ -101,7 +78,6 @@ int main(){
                     if(Input::mousePos.y < -limit){
                         Input::mousePos.y = -limit;
                     }
-                    std::cout << Input::mousePos.y << "\n";
 
                     player.turnCamera();
                 }
@@ -137,18 +113,19 @@ int main(){
             glViewport(0,0,outWidth,outHeight);
             renderer -> PreDraw(outWidth, outHeight);
         }
-        square.Draw();
-        square2.Draw();
-        foo -> Draw();
-        bar -> Draw();
+        for(Mesh* object : objects){
+            object -> Draw();
+        }
         window.swapWindow();
     }
 
     SDL_Quit();
     window.cleanUp();
     delete renderer;
-    delete foo;
-    delete bar;
+    
+    for(Mesh*& model : models){
+        delete model;
+    }
     
     return 0;
 }
