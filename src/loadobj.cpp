@@ -24,7 +24,7 @@ namespace LoadObj{
         vector<GLfloat> data;
         orderData(data, points);
 
-        outMesh = new Mesh(data, indices, {{0, 0, 0}, 0, {1, 1, 1}}, texture);
+        outMesh = new Mesh(data, indices, texture);
         
     }
     void seperateValues(string& line, string* out, int size, int start, char delimiter){
@@ -159,5 +159,13 @@ namespace LoadObj{
             }
         }
         return res;
+    }
+    void loadModels(vector<pair<const char*, const char*>> filenames){
+        models.reserve(filenames.size());
+        for(int i = 0; i < filenames.size(); ++i){
+            Mesh* foo;
+            ParseFile(filenames[i].first, foo, filenames[i].second);
+            models.push_back(foo);
+        }
     }
 }

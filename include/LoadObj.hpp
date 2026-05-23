@@ -7,6 +7,8 @@
 
 #include "Mesh.hpp"
 
+extern std::vector<Mesh*> models;
+
 namespace LoadObj{
     struct GroupedPoint{
         glm::vec3* position;
@@ -30,4 +32,6 @@ namespace LoadObj{
             out[i] = conversion(textBuffer[i]);
         }       
     }
+    
+    void loadModels(std::vector<std::pair<const char*, const char*>> filenames);
 }
