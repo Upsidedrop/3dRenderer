@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <vector>
 #include <list>
+#include <glm/glm.hpp>
 
 #include "Transform.hpp"
 #include "BoundingBox.hpp"
@@ -17,8 +18,9 @@ class Mesh{
     void Draw();
     Transform transform;
     BoundingBox bounds;
-    void instantiate(const Transform& p_transform);
+    void instantiate(const Transform& p_transform, const glm::vec4& p_color = glm::vec4(1));
     private:
     GLuint indexBufferObject;
     GLuint texture;
+    glm::vec4 color;
 };

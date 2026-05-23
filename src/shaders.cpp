@@ -26,6 +26,7 @@ namespace Shaders{
     "#version 410 compatibility\n"
 
     "in vec3 v_vertexColors;\n"
+    "uniform vec4 u_Albedo;\n"
 
     "out vec4 color;\n"
 
@@ -34,5 +35,6 @@ namespace Shaders{
     "void main()\n"
     "{\n"
     "   color = texture(u_textureSampler, vec2(v_vertexColors.x, v_vertexColors.y)).rgba;\n"
+    "   color = vec4(color.r * u_Albedo.r, color.g * u_Albedo.g, color.b * u_Albedo.b, color.a * u_Albedo.a);\n"
     "}\n";
 }
