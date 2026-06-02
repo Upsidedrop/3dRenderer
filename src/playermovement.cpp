@@ -82,3 +82,80 @@ void PlayerMovement::turnCamera(){
     cam -> turnHorizontal(-glm::radians(Input::mousePos.x * sensitivity));
     cam -> turnVertical(glm::radians(Input::mousePos.y * sensitivity));
 }
+Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p_screenHeight){
+    Mesh* closest = nullptr;
+    float closestScreenPos = INFINITY;
+    
+    mat4 cameraMatrix = cam -> getCameraMatrix();
+    mat4 perspectiveMatrix = perspective<float>(radians(45.0), (float)p_screenWidth / (float)p_screenHeight, 0.1, 10);
+
+    // auto foo = perspectiveMatrix * cameraMatrix * vec4(0.5, 0, -0.5, 1);
+    // std::cout << foo.x / foo.w << ", " << foo.y / foo.w <<", " << foo.z / foo.w << "\n";
+    // std::cout << ((float)mouseX / float(p_screenWidth)) * 2 - 1 << ", " << 1 - ((float)mouseY / (float)p_screenHeight)*2 << "\n";
+
+    for(Mesh* obj : objects){
+        // checks whether object is between closest other object and camera
+        vec4 screenPos = vec4(obj -> transform.position, 1);
+        screenPos = cameraMatrix * screenPos;
+
+        std::cout << "x: " << screenPos.x << ", y: " << screenPos.y << ", z: " << screenPos.z << ", w: " << screenPos.w << "\n";
+
+        if(closest != nullptr){
+            if(screenPos.z < closestScreenPos){
+                continue;
+            }
+        }
+        if(screenPos.z > 0){
+            continue;
+        }
+
+        mat4 transformMatrix = translate(mat4(1), obj -> transform.position);
+        transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation), vec3(0, 1, 0));
+        transformMatrix = glm::scale(transformMatrix, obj -> transform.scale);
+
+        SDL_FPoint mousePos = {((float)mouseX / float(p_screenWidth)) * 2 - 1, 1 - ((float)mouseY / (float)p_screenHeight)*2};
+
+        mat4 combinedMatrix = perspectiveMatrix * cameraMatrix * transformMatrix;
+        if(checkBounds(obj -> bounds, combinedMatrix, mousePos, false) || checkBounds(obj -> bounds, combinedMatrix, mousePos, true)){
+            closest = obj;
+            closestScreenPos = screenPos.z;
+        }
+    }
+    return closest;
+}
+bool PlayerMovement::checkBounds(BoundingBox bounds, const mat4& matrix, const SDL_FPoint& mousePos, bool flipped){
+    SDL_FRect bounds2d;
+
+    if(flipped){
+        std::swap<float>(bounds.smallCorner.z, bounds.largeCorner.z);
+    }
+
+    vec4 smallCorner, largeCorner;
+    smallCorner = matrix * vec4(bounds.smallCorner, 1);
+    largeCorner = matrix * vec4(bounds.largeCorner, 1);
+
+    // if(smallCorner.x / smallCorner.w > largeCorner.x / largeCorner.w){
+    //     std::swap<vec4>(smallCorner, largeCorner);
+    // }
+
+    SDL_FPoint points[2] = 
+    {
+        SDL_FPoint{smallCorner.x / smallCorner.w, smallCorner.y / smallCorner.w},
+        SDL_FPoint{largeCorner.x / largeCorner.w, largeCorner.y / largeCorner.w}
+    };
+    SDL_EncloseFPoints(
+        points,
+        2, 
+        NULL, 
+        &bounds2d
+    );
+    
+    // bounds2d = {
+    //     smallCorner.x / smallCorner.w,
+    //     smallCorner.y / smallCorner.w, 
+    //     largeCorner.x / largeCorner.w - smallCorner.x / smallCorner.w,
+    //     largeCorner.y / largeCorner.w - smallCorner.y / smallCorner.w
+    // };
+
+    return SDL_PointInFRect(&mousePos, &bounds2d);
+}

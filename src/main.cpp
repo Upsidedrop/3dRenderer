@@ -92,6 +92,19 @@ int main(){
                 case SDL_MOUSEBUTTONDOWN:
                 {
                     Input::mouseButtons[event.button.button - 1] = true;
+
+                    if(Input::mouseButtons[2]){
+                        break;
+                    }
+                    if(event.button.button != SDL_BUTTON_LEFT){
+                        break;
+                    }
+
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    int w, h;
+                    window.getDimensions(w, h);
+                    std::cout << player.getLookAt(x, y, w, h) << "\n";
                 }
                 break;
                 case SDL_MOUSEBUTTONUP:
