@@ -1,9 +1,12 @@
 #include "PlayerMovement.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "Input.hpp"
 #include "SDL2/SDL.h"
 #include "Time.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/exterior_product.hpp"
 
 #include <iostream>
 #include <complex>
@@ -107,7 +110,7 @@ Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p
         transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation), vec3(0, 1, 0));
         transformMatrix = glm::scale(transformMatrix, obj -> transform.scale);
 
-        SDL_FPoint mousePos = {((float)mouseX / float(p_screenWidth)) * 2 - 1, 1 - ((float)mouseY / (float)p_screenHeight)*2};
+        vec2 mousePos = {((float)mouseX / float(p_screenWidth)) * 2 - 1, 1 - ((float)mouseY / (float)p_screenHeight)*2};
 
         mat4 combinedMatrix = perspectiveMatrix * cameraMatrix * transformMatrix;
         if(checkBounds(obj -> bounds, combinedMatrix, mousePos)){
@@ -117,13 +120,13 @@ Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p
     }
     return closest;
 }
-bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const SDL_FPoint& mousePos){
-    SDL_FPoint screenPoints[8];
+bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const vec2& mousePos){
+    vec2 screenPoints[8];
     flattenPoints(bounds, matrix, screenPoints);
 
     // Back Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[0],
             &screenPoints[3],
@@ -136,7 +139,7 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     // Left Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[0],
             &screenPoints[4],
@@ -149,7 +152,7 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     // Right Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[2],
             &screenPoints[6],
@@ -162,7 +165,7 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     // Front Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[1],
             &screenPoints[5],
@@ -175,7 +178,7 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     // Top Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[4],
             &screenPoints[7],
@@ -188,7 +191,7 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     // Bottom Face
     {
-        SDL_FPoint* quad[4] =
+        vec2* quad[4] =
         {
             &screenPoints[0],
             &screenPoints[1],
@@ -201,17 +204,17 @@ bool PlayerMovement::checkBounds(BoundingBox& bounds, const mat4& matrix, const 
     }
     return false;
 }
-bool PlayerMovement::checkQuad(SDL_FPoint** quad, const SDL_FPoint& point){
+bool PlayerMovement::checkQuad(vec2** quad, const vec2& point){
     const int NUM_POINTS = 4;
 
     int pos = 0;
     int neg = 0;
 
     for(int i = 0; i < NUM_POINTS; ++i){
-        const SDL_FPoint* a = quad[i];
-        const SDL_FPoint* b = quad[(i + 1) % NUM_POINTS];
+        const vec2* a = quad[i];
+        const vec2* b = quad[(i + 1) % NUM_POINTS];
 
-        double d = (b -> x - a -> x) * (point.y - a -> y) - (b -> y - a -> y) * (point.x - a -> x);
+        float d = cross(*b - *a, point - *a);
 
         ++((d > 0)? pos : neg);
 
@@ -221,7 +224,7 @@ bool PlayerMovement::checkQuad(SDL_FPoint** quad, const SDL_FPoint& point){
     }
     return true;
 }
-void PlayerMovement::flattenPoints(const BoundingBox& bounds, const glm::mat4& matrix, SDL_FPoint* outPoints){
+void PlayerMovement::flattenPoints(const BoundingBox& bounds, const glm::mat4& matrix, vec2* outPoints){
     flattenVec4(matrix * vec4(bounds.smallCorner.x, bounds.smallCorner.y, bounds.smallCorner.z, 1), outPoints[0]);
     flattenVec4(matrix * vec4(bounds.smallCorner.x, bounds.smallCorner.y, bounds.largeCorner.z, 1), outPoints[1]);
     flattenVec4(matrix * vec4(bounds.largeCorner.x, bounds.smallCorner.y, bounds.largeCorner.z, 1), outPoints[2]);
@@ -232,7 +235,7 @@ void PlayerMovement::flattenPoints(const BoundingBox& bounds, const glm::mat4& m
     flattenVec4(matrix * vec4(bounds.largeCorner.x, bounds.largeCorner.y, bounds.largeCorner.z, 1), outPoints[6]);
     flattenVec4(matrix * vec4(bounds.largeCorner.x, bounds.largeCorner.y, bounds.smallCorner.z, 1), outPoints[7]);
 }
-void PlayerMovement::flattenVec4(const glm::vec4& vector, SDL_FPoint& outPoint){
+void PlayerMovement::flattenVec4(const glm::vec4& vector, vec2& outPoint){
     outPoint = 
     {
         vector.x / vector.w,
