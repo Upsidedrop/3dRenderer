@@ -5,7 +5,6 @@
 #include <list>
 
 #include "Transform.hpp"
-#include "BoundingBox.hpp"
 
 class Mesh;
 
@@ -16,7 +15,6 @@ class Mesh{
     Mesh(std::vector<GLfloat>& p_points, std::vector<GLuint>& pointOrder, const char* p_texture);
     void Draw();
     Transform transform;
-    BoundingBox bounds;
     void instantiate(const Transform& p_transform);
     private:
     GLuint indexBufferObject;
