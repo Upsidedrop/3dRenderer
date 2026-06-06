@@ -101,7 +101,6 @@ int main(){
                     if(Input::mousePos.y < -limit){
                         Input::mousePos.y = -limit;
                     }
-                    std::cout << Input::mousePos.y << "\n";
 
                     player.turnCamera();
                 }
