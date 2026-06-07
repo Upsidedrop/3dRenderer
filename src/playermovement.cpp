@@ -85,6 +85,27 @@ void PlayerMovement::turnCamera(){
     cam -> turnHorizontal(-glm::radians(Input::mousePos.x * sensitivity));
     cam -> turnVertical(glm::radians(Input::mousePos.y * sensitivity));
 }
+vec3 PlayerMovement::getPointOnPlane(const vec3& offset, const vec3& normal, int mouseX, int mouseY, int p_screenWidth, int p_screenHeight){
+    const double MAGIC_NUMBER_IDK = 9.0 / 11.0;
+    
+    mat4 inverseMatrix;
+    
+    {
+        mat4 cameraMatrix = cam -> getCameraMatrix();
+        mat4 perspectiveMatrix = perspective<float>(radians(45.0), (float)p_screenWidth / (float)p_screenHeight, 0.1, 10);
+
+        inverseMatrix = inverse(perspectiveMatrix * cameraMatrix);
+    }
+
+    vec4 foo(pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight), 1, 1);
+
+    vec4 ray = inverseMatrix * vec4(pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight), MAGIC_NUMBER_IDK, 1) - vec4(cam -> getPosition(), 1);
+
+    return vec3(ray) * (dot(offset - cam->getPosition(), normal) / dot(vec3(ray), normal)) + cam->getPosition();
+}
+vec2 PlayerMovement::pointToWindowSpace(int p_x, int p_y, int p_screenWidth, int p_screenHeight){
+    return {((float)p_x / float(p_screenWidth)) * 2 - 1, 1 - ((float)p_y / (float)p_screenHeight)*2};
+}
 Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p_screenHeight){
     Mesh* closest = nullptr;
     float closestScreenPos = INFINITY;
@@ -110,7 +131,7 @@ Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p
         transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation), vec3(0, 1, 0));
         transformMatrix = glm::scale(transformMatrix, obj -> transform.scale);
 
-        vec2 mousePos = {((float)mouseX / float(p_screenWidth)) * 2 - 1, 1 - ((float)mouseY / (float)p_screenHeight)*2};
+        vec2 mousePos = pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight);
 
         mat4 combinedMatrix = perspectiveMatrix * cameraMatrix * transformMatrix;
         if(checkBounds(obj -> bounds, combinedMatrix, mousePos)){

@@ -45,6 +45,8 @@ int main(){
     models[1] -> instantiate({{-0.5, 2, -0.5}, 60, {0.5, 0.5, 0.5}}, {0, 1, 0, 1});
 
     renderer -> VertexSpecification();
+
+    Mesh* selectedObject = nullptr;
     
     while(gameRunning){
         Time::updateDeltaTime();
@@ -99,12 +101,11 @@ int main(){
                     if(event.button.button != SDL_BUTTON_LEFT){
                         break;
                     }
-
                     int x, y;
                     SDL_GetMouseState(&x, &y);
                     int w, h;
                     window.getDimensions(w, h);
-                    std::cout << player.getLookAt(x, y, w, h) << "\n";
+                    selectedObject = player.getLookAt(x, y, w, h);
                 }
                 break;
                 case SDL_MOUSEBUTTONUP:
@@ -116,6 +117,17 @@ int main(){
         }
 
         player.checkInputs();
+
+        if(selectedObject != nullptr && Input::mouseButtons[0]){
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            int w, h;
+            window.getDimensions(w, h);
+            
+            auto foo = player.getPointOnPlane(selectedObject -> transform.position, glm::vec3(0, 0, 1), x, y, w, h);
+            std::cout << "x: " << foo.x << ", y: " << foo.y << ", z: " << foo.z << "\n";
+            selectedObject -> transform.position = foo;
+        }
 
         {
             int outWidth, outHeight;

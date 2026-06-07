@@ -16,6 +16,7 @@ class PlayerMovement{
     void turnCamera();
     float sensitivity;
     Mesh* getLookAt(int mouseX, int mouseY, int p_screenWidth, int p_screenHeight);
+    glm::vec3 getPointOnPlane(const glm::vec3& offset, const glm::vec3& normal, int mouseX, int mouseY, int p_screenWidth, int p_screenHeight);
     private:
     Camera* cam;
     float speed, defaultSpeed;
@@ -24,4 +25,5 @@ class PlayerMovement{
     bool checkQuad(glm::vec2** quad, const glm::vec2& point);
     void flattenPoints(const BoundingBox& bounds, const glm::mat4& matrix, glm::vec2* outPoints);
     void flattenVec4(const glm::vec4& vector, glm::vec2& outPoint);
+    glm::vec2 pointToWindowSpace(int p_x, int p_y, int p_screenWidth, int p_screenHeight);
 };
