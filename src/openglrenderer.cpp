@@ -146,7 +146,9 @@ void OpenGLRenderer::PreDraw(int p_screenWidth, int p_screenHeight){
 }
 void OpenGLRenderer::setTransformUniform(Transform& p_transform){
     mat4 transformMatrix = translate(mat4(1), p_transform.position);
-    transformMatrix = rotate<float>(transformMatrix, radians(p_transform.rotation), vec3(0, 1, 0));
+    transformMatrix = rotate<float>(transformMatrix, radians(p_transform.rotation.x), vec3(1, 0, 0));
+    transformMatrix = rotate<float>(transformMatrix, radians(p_transform.rotation.z), vec3(0, 0, -1));
+    transformMatrix = rotate<float>(transformMatrix, radians(p_transform.rotation.y), vec3(0, 1, 0));
     transformMatrix = glm::scale(transformMatrix, p_transform.scale);
 
     GLint translateLocation = glGetUniformLocation(graphicsPipeline, "u_TranslateMatrix");

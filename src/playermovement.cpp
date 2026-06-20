@@ -128,7 +128,9 @@ Mesh* PlayerMovement::getLookAt(int mouseX, int mouseY, int p_screenWidth, int p
         }
 
         mat4 transformMatrix = translate(mat4(1), obj -> transform.position);
-        transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation), vec3(0, 1, 0));
+        transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation.x), vec3(1, 0, 0));
+        transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation.z), vec3(0, 0, -1));
+        transformMatrix = rotate<float>(transformMatrix, radians(obj -> transform.rotation.y), vec3(0, 1, 0));        
         transformMatrix = glm::scale(transformMatrix, obj -> transform.scale);
 
         vec2 mousePos = pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight);
