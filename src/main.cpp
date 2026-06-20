@@ -35,14 +35,14 @@ int main(){
     LoadObj::loadModels(
         {
             {"res/icosphere/Untitled.obj", "res/Icosphere.bmp"},
-            {"res/obj/Untitled.obj","res/Cube.bmp"}
+            {"res/Arrow/Untitled.obj","res/Empty.bmp"}
         }
     );
 
     models[0] -> instantiate({{0.5, 0, -0.5}, {0, 0, 0}, {0.5, 0.5, 0.5}});
     models[1] -> instantiate({{-0.5, 0, -0.5}, {0, 0, 0}, {0.5, 0.5, 0.5}}, {1, 0, 0, 1});
-    models[1] -> instantiate({{-0.5, 1.5, -0.5}, {30, 30, 30}, {0.5, 0.5, 0.5}}, {1, 1, 0, 1});
-    models[1] -> instantiate({{-0.5, 3, -0.5}, {-60, -60, -60}, {0.5, 0.5, 0.5}}, {0, 1, 0, 1});
+    models[1] -> instantiate({{-0.5, 1.5, -0.5}, {0, 90, 0}, {0.5, 0.5, 0.5}}, {1, 1, 0, 1});
+    models[1] -> instantiate({{-0.5, 3, -0.5}, {-90, 0, 0}, {0.5, 0.5, 0.5}}, {0, 1, 0, 1});
 
     renderer -> VertexSpecification();
 
