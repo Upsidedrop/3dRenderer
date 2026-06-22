@@ -86,20 +86,21 @@ void PlayerMovement::turnCamera(){
     cam -> turnVertical(glm::radians(Input::mousePos.y * sensitivity));
 }
 vec3 PlayerMovement::getPointOnPlane(const vec3& offset, const vec3& normal, int mouseX, int mouseY, int p_screenWidth, int p_screenHeight){
-    const double MAGIC_NUMBER_IDK = 9.0 / 11.0;
+    const double NEAR = 0.1;
+    const double FAR = 10;
     
     mat4 inverseMatrix;
     
     {
         mat4 cameraMatrix = cam -> getCameraMatrix();
-        mat4 perspectiveMatrix = perspective<float>(radians(45.0), (float)p_screenWidth / (float)p_screenHeight, 0.1, 10);
+        mat4 perspectiveMatrix = perspective<float>(radians(45.0), (float)p_screenWidth / (float)p_screenHeight, NEAR, FAR);
 
         inverseMatrix = inverse(perspectiveMatrix * cameraMatrix);
     }
 
     vec4 foo(pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight), 1, 1);
 
-    vec4 ray = inverseMatrix * vec4(pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight), MAGIC_NUMBER_IDK, 1) - vec4(cam -> getPosition(), 1);
+    vec4 ray = inverseMatrix * vec4(pointToWindowSpace(mouseX, mouseY, p_screenWidth, p_screenHeight), (FAR - NEAR) / (2 * NEAR * FAR + NEAR + FAR), 1) - vec4(cam -> getPosition(), 1);
 
     return vec3(ray) * (dot(offset - cam->getPosition(), normal) / dot(vec3(ray), normal)) + cam->getPosition();
 }
